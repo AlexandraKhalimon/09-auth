@@ -12,3 +12,4 @@ export interface NewNote {
     content: string;
     tag: string;
 }
+

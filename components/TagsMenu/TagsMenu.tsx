@@ -1,17 +1,30 @@
 'use client'
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import css from './TagsMenu.module.css';
 import Link from 'next/link';
+import { fetchNotes } from '@/lib/api/clientApi';
 
-interface TagsMenuProps {
-    tags: string[];
-}
-
-export default function TagsMenu({tags}: TagsMenuProps) {
+export default function TagsMenu() {
     const [isOpen, setIsOpen] = useState(false);
     const toggle = () => setIsOpen(!isOpen);
     const close = () => setIsOpen(false);
+    const [tags, setTags] = useState<string[]>([]);
+
+    useEffect(() => {
+        const fetchTags = async () => {
+            const notesResponse = await fetchNotes({
+                search: '',
+                page: 1,
+                perPage: 12,
+                tag: undefined,
+            });
+            const allTags = notesResponse.notes.map((note) => note.tag);
+            const noteTags = allTags.filter((tag, index, allTags) => allTags.indexOf(tag) === index);
+            setTags(['All notes', ...noteTags]);
+        };
+        fetchTags();
+    }, []);
 
     return (
         <div className={css.menuContainer}>
